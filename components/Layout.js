@@ -1,70 +1,88 @@
-import { AppBar, Container, Toolbar, Typography ,Link,ThemeProvider, createTheme, CssBaseline  } from "@material-ui/core";
+import React, { useContext } from "react";
 import Head from "next/head";
-import React, { Children } from "react";
-import useStyles from "../Utils/styles";
-import NextLink from 'next/link'
-export default function Layout({ title,children,description}) {
-    
-   const theme= createTheme({
+import NextLink from "next/link";
+import {
+  AppBar,
+  Toolbar,
+  Typography,
+  Container,
+  Link,
+  createMuiTheme,
+  ThemeProvider,
+  CssBaseline,
+  Switch,
+} from "@material-ui/core";
+import useStyles from "../utils/styles";
+import { Store } from "../Utils/Store";
+import Cookies from "js-cookie";
+
+export default function Layout({ title, description, children , state }) {
+  const {dispatch}  = useContext(Store);
+  const  darkMode = state;
+  const theme = createMuiTheme({
     typography: {
       h1: {
-        fontSize: '1.6rem',
+        fontSize: "1.6rem",
         fontWeight: 400,
-        margin: '1rem 0',
+        margin: "1rem 0",
       },
       h2: {
-        fontSize: '1.4rem',
+        fontSize: "1.4rem",
         fontWeight: 400,
-        margin: '1rem 0',
+        margin: "1rem 0",
       },
     },
     palette: {
-      type: 'light',
+      type: darkMode ? "dark" : "light",
       primary: {
-        main: '#f0c000',
+        main: "#f0c000",
       },
       secondary: {
-        main: '#208080',
+        main: "#208080",
       },
     },
-   });
-    const classes= useStyles ();
+  });
+  const classes = useStyles();
+  const darkModeChangeHandler = () => {
+    dispatch({ type: darkMode ? "DARK_MODE_OFF" : "DARK_MODE_ON" });
+    const newDarkMode = !darkMode;
+    Cookies.set("darkMode", newDarkMode ? "ON" : "OFF");
+  };
   return (
     <div>
       <Head>
-        <title> {title ? `${title} -  Next Amazona` : 'Next Amazona'}
-         </title>
-         {description && <meta name ="description" content={description}></meta>}
-      
+        <title>{title ? `${title} - Next Amazona` : "Next Amazona"}</title>
+        {description && <meta name="description" content={description}></meta>}
       </Head>
       <ThemeProvider theme={theme}>
-      <CssBaseline />
-      <AppBar position="static" className={classes.navbar}>
-        <Toolbar>
-          <NextLink href="/ " passHref> 
-          <Link>
-          <Typography className={classes.brand}>amazona</Typography>
-          </Link>
-         </NextLink>
-         <div className={classes.grow}></div>
-         <div>
-           <NextLink href='/cart' passHref>
-             <Link>Cart</Link>
-           </NextLink>
-           <NextLink href='/Login' passHref>
-             <Link>Login</Link>
-           </NextLink>
-         </div>
-        </Toolbar>
-      </AppBar>
-      <Container className={classes.main}>{children}</Container>
-      <footer className={classes.footer}>
-          <Typography>
-              ALL Rights Reserved.  Next Amazonz..
-          </Typography>
-      </footer>
+        <CssBaseline />
+        <AppBar position="static" className={classes.navbar}>
+          <Toolbar>
+            <NextLink href="/" passHref>
+              <Link>
+                <Typography className={classes.brand}>amazona</Typography>
+              </Link>
+            </NextLink>
+            <div className={classes.grow}></div>
+            <div>
+              <Switch
+                checked={darkMode}
+                onChange={darkModeChangeHandler}
+              ></Switch>
+              <NextLink href="/cart" passHref>
+                <Link>Cart</Link>
+              </NextLink>
+              <NextLink href="/login" passHref>
+                <Link>Login</Link>
+              </NextLink>
+            </div>
+          </Toolbar>
+        </AppBar>
+        <Container className={classes.main}>{children}</Container>
+        <footer className={classes.footer}>
+          <Typography>All rights reserved. Next Amazona.</Typography>
+        </footer>
       </ThemeProvider>
-     
     </div>
   );
 }
